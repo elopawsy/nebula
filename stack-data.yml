@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: nebula
+      POSTGRES_PASSWORD: nebula_pass
+      POSTGRES_DB: nebula
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nebula-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == ubuntu3-mickisze
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - nebula-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == ubuntu3-mickisze
+
+  elstaicsearch:
+    image: elasticsearch:8.13.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - nebula-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == ubuntu3-mickisze
+
+volumes:
+  postgres_data:
+  redis_data:
+  kafka_data:
+  es_data:
+
+networks:
+  nebula-net:
+    external: true
