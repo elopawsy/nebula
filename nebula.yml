@@ -177,64 +177,138 @@ services:
         - "traefik.http.services.auth.loadbalancer.server.port=3000"
 
   posts-service:
-    image: node:20-alpine
-    command: sh -c "echo 'posts-service placeholder' && sleep infinity"
+    build: ./posts-service
+    image: nebula-posts-service:latest
+    environment:
+      - DB_HOST=postgres-primary
+      - DB_PORT=5432
+      - DB_NAME=nebula
+      - DB_USER=nebula
+      - DB_PASSWORD=nebula_pass
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
     networks:
       - nebula-net
     deploy:
+      replicas: 2
       placement:
         constraints:
           - node.hostname == ubuntu2-mickisze
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.posts.rule=Host(`api.nebula.local`) && PathPrefix(`/posts`)"
+        - "traefik.http.services.posts.loadbalancer.server.port=3000"
 
   timeline-service:
-    image: node:20-alpine
-    command: sh -c "echo 'timeline-service placeholder' && sleep infinity"
+    build: ./timeline-service
+    image: nebula-timeline-service:latest
+    environment:
+      - DB_HOST=postgres-primary
+      - DB_PORT=5432
+      - DB_NAME=nebula
+      - DB_USER=nebula
+      - DB_PASSWORD=nebula_pass
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
     networks:
       - nebula-net
     deploy:
+      replicas: 2
       placement:
         constraints:
           - node.hostname == ubuntu2-mickisze
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.timeline.rule=Host(`api.nebula.local`) && PathPrefix(`/timeline`)"
+        - "traefik.http.services.timeline.loadbalancer.server.port=3000"
 
   follow-service:
-    image: node:20-alpine
-    command: sh -c "echo 'follow-service placeholder' && sleep infinity"
+    build: ./follow-service
+    image: nebula-follow-service:latest
+    environment:
+      - DB_HOST=postgres-primary
+      - DB_PORT=5432
+      - DB_NAME=nebula
+      - DB_USER=nebula
+      - DB_PASSWORD=nebula_pass
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
     networks:
       - nebula-net
     deploy:
+      replicas: 2
       placement:
         constraints:
           - node.hostname == ubuntu2-mickisze
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.follow.rule=Host(`api.nebula.local`) && PathPrefix(`/follow`)"
+        - "traefik.http.services.follow.loadbalancer.server.port=3000"
 
   notif-service:
-    image: node:20-alpine
-    command: sh -c "echo 'notif-service placeholder' && sleep infinity"
+    build: ./notif-service
+    image: nebula-notif-service:latest
+    environment:
+      - DB_HOST=postgres-primary
+      - DB_PORT=5432
+      - DB_NAME=nebula
+      - DB_USER=nebula
+      - DB_PASSWORD=nebula_pass
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
     networks:
       - nebula-net
     deploy:
+      replicas: 2
       placement:
         constraints:
           - node.hostname == ubuntu2-mickisze
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.notif.rule=Host(`api.nebula.local`) && PathPrefix(`/notifications`)"
+        - "traefik.http.services.notif.loadbalancer.server.port=3000"
 
   search-service:
-    image: node:20-alpine
-    command: sh -c "echo 'search-service placeholder' && sleep infinity"
+    build: ./search-service
+    image: nebula-search-service:latest
+    environment:
+      - ES_URL=http://elasticsearch:9200
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
     networks:
       - nebula-net
     deploy:
+      replicas: 2
       placement:
         constraints:
           - node.hostname == ubuntu2-mickisze
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.search.rule=Host(`api.nebula.local`) && PathPrefix(`/search`)"
+        - "traefik.http.services.search.loadbalancer.server.port=3000"
 
   moderation-service:
-    image: node:20-alpine
-    command: sh -c "echo 'moderation-service placeholder' && sleep infinity"
+    build: ./moderation-service
+    image: nebula-moderation-service:latest
+    environment:
+      - DB_HOST=postgres-primary
+      - DB_PORT=5432
+      - DB_NAME=nebula
+      - DB_USER=nebula
+      - DB_PASSWORD=nebula_pass
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
     networks:
       - nebula-net
     deploy:
+      replicas: 2
       placement:
         constraints:
           - node.hostname == ubuntu2-mickisze
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.moderation.rule=Host(`api.nebula.local`) && PathPrefix(`/moderate`)"
+        - "traefik.http.services.moderation.loadbalancer.server.port=3000"
 
 configs:
   prometheus_config:
