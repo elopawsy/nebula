@@ -155,14 +155,26 @@ services:
   # ── VM2 : SERVICES MÉTIER ───────────────────────────
 
   auth-service:
-    image: node:20-alpine
-    command: sh -c "echo 'auth-service placeholder' && sleep infinity"
+    build: ./api
+    image: nebula-api:latest
+    environment:
+      - DB_HOST=postgres-primary
+      - DB_PORT=5432
+      - DB_NAME=nebula
+      - DB_USER=nebula
+      - DB_PASSWORD=nebula_pass
+      - PORT=3000
     networks:
       - nebula-net
     deploy:
+      replicas: 2
       placement:
         constraints:
           - node.hostname == ubuntu2-mickisze
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.auth.rule=Host(`api.nebula.local`) && PathPrefix(`/auth`)"
+        - "traefik.http.services.auth.loadbalancer.server.port=3000"
 
   posts-service:
     image: node:20-alpine
